@@ -31,7 +31,7 @@ public class UsuarioController {
     }
 
     @GetMapping
-    @Operation(summary = "usuario", description = "Método responsavel de calcular os custos da folha de pagamento e após faz os lançamentos contabeis na tabela....") //documentar a operaçcao
+    @Operation(summary = "usuario", description = "Método responsavel por listar todos os usuários")
     public ResponseEntity<?> consultarTodos() {
 
 
