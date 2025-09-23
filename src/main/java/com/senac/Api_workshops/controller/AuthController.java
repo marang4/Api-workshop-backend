@@ -1,6 +1,7 @@
 package com.senac.Api_workshops.controller;
 
 import com.senac.Api_workshops.dto.LoginRequestDto;
+import com.senac.Api_workshops.dto.LoginResponseDto;
 import com.senac.Api_workshops.services.TokenService;
 import com.senac.Api_workshops.services.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,7 +37,7 @@ public class AuthController {
 
         var token = tokenService.gerarToken(request);
 
-        return ResponseEntity.ok(token);
+        return ResponseEntity.ok(new LoginResponseDto(token));
     }
 
 

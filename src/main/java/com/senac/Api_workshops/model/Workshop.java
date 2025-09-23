@@ -1,5 +1,6 @@
 package com.senac.Api_workshops.model;
 
+import com.senac.Api_workshops.dto.WorkshopRequestDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,4 +24,6 @@ public class Workshop {
     private LocalDate data;
     private Integer vagasTotais;
     private Integer vagasOcupadas;
+
+
 }

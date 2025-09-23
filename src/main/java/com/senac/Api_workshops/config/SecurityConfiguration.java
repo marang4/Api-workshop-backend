@@ -25,6 +25,7 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
                         auth
+                                .requestMatchers("/**").permitAll()
                                 .requestMatchers("/auth/login").permitAll()
                                 .requestMatchers(HttpMethod.OPTIONS,"/**").permitAll() //liberar cors
                                 .requestMatchers("/swagger-resources/**").permitAll()
