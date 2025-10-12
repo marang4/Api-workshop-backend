@@ -1,4 +1,4 @@
-package com.senac.Api_workshops.config;
+package com.senac.Api_workshops.infra.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;

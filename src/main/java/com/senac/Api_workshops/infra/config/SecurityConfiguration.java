@@ -1,4 +1,4 @@
-package com.senac.Api_workshops.config;
+package com.senac.Api_workshops.infra.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

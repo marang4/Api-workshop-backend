@@ -1,5 +1,7 @@
-package com.senac.Api_workshops.model;
+package com.senac.Api_workshops.domain.model;
 
+import com.senac.Api_workshops.application.dto.usuario.UsuarioRequestDto;
+import com.senac.Api_workshops.application.dto.usuario.UsuarioResponseDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -19,6 +22,17 @@ import java.util.List;
 public class Usuario implements UserDetails {
 
 
+    public Usuario(UsuarioRequestDto UsuarioRequestDto) {
+        this.setCpf(UsuarioRequestDto.cpf());
+        this.setNome(UsuarioRequestDto.nome());
+        this.setEmail(UsuarioRequestDto.email());
+        this.setSenha(UsuarioRequestDto.senha());
+        this.setRole(UsuarioRequestDto.role());
+        if (this.getDataCadastro()==null) {
+            this.setDataCadastro(LocalDateTime.now());
+        }
+
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,9 +40,10 @@ public class Usuario implements UserDetails {
     private String nome;
     private String email;
     private String senha;
-
+    private String cpf;
     private String role;
 
+    private LocalDateTime dataCadastro;
 
 
     @Override
@@ -43,27 +58,30 @@ public class Usuario implements UserDetails {
 
     @Override
     public String getPassword() {
-        return "";
+        return this.senha;
     }
 
     @Override
     public String getUsername() {
-        return "";
+        return this.email;
     }
 
     @Override
-    public boolean isAccountNonExpired() {
-        return UserDetails.super.isAccountNonExpired();
+    public boolean isAccountNonExpired()
+    {
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return UserDetails.super.isAccountNonLocked();
+
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return UserDetails.super.isCredentialsNonExpired();
+
+        return true;
     }
 
     @Override
@@ -71,6 +89,8 @@ public class Usuario implements UserDetails {
         return UserDetails.super.isEnabled();
     }
 
-
+    public UsuarioResponseDto toDtoResponse() {
+        return new UsuarioResponseDto(this);
+    }
 
 }

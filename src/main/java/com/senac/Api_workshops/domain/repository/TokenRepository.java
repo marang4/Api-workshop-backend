@@ -1,6 +1,6 @@
-package com.senac.Api_workshops.repository;
+package com.senac.Api_workshops.domain.repository;
 
-import com.senac.Api_workshops.model.Token;
+import com.senac.Api_workshops.domain.model.Token;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

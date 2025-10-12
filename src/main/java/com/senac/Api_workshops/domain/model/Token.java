@@ -1,4 +1,4 @@
-package com.senac.Api_workshops.model;
+package com.senac.Api_workshops.domain.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

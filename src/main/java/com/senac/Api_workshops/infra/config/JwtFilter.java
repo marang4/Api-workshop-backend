@@ -1,6 +1,6 @@
-package com.senac.Api_workshops.config;
+package com.senac.Api_workshops.infra.config;
 
-import com.senac.Api_workshops.services.TokenService;
+import com.senac.Api_workshops.application.services.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

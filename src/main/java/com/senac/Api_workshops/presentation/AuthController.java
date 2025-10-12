@@ -1,9 +1,9 @@
-package com.senac.Api_workshops.controller;
+package com.senac.Api_workshops.presentation;
 
-import com.senac.Api_workshops.dto.LoginRequestDto;
-import com.senac.Api_workshops.dto.LoginResponseDto;
-import com.senac.Api_workshops.services.TokenService;
-import com.senac.Api_workshops.services.UsuarioService;
+import com.senac.Api_workshops.application.dto.login.LoginRequestDto;
+import com.senac.Api_workshops.application.dto.login.LoginResponseDto;
+import com.senac.Api_workshops.application.services.TokenService;
+import com.senac.Api_workshops.application.services.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;

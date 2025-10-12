@@ -1,6 +1,5 @@
-package com.senac.Api_workshops.model;
+package com.senac.Api_workshops.domain.model;
 
-import com.senac.Api_workshops.dto.WorkshopRequestDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

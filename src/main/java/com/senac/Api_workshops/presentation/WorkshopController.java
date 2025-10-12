@@ -1,8 +1,8 @@
-package com.senac.Api_workshops.controller;
+package com.senac.Api_workshops.presentation;
 
-import com.senac.Api_workshops.dto.WorkshopRequestDto;
-import com.senac.Api_workshops.model.Workshop;
-import com.senac.Api_workshops.services.WorkshopService;
+import com.senac.Api_workshops.application.dto.workshop.WorkshopRequestDto;
+import com.senac.Api_workshops.domain.model.Workshop;
+import com.senac.Api_workshops.application.services.WorkshopService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;

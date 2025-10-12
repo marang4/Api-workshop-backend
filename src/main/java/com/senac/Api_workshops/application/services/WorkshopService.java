@@ -1,8 +1,8 @@
-package com.senac.Api_workshops.services;
+package com.senac.Api_workshops.application.services;
 
-import com.senac.Api_workshops.dto.WorkshopRequestDto;
-import com.senac.Api_workshops.model.Workshop;
-import com.senac.Api_workshops.repository.WorkshopRepository;
+import com.senac.Api_workshops.application.dto.workshop.WorkshopRequestDto;
+import com.senac.Api_workshops.domain.model.Workshop;
+import com.senac.Api_workshops.domain.repository.WorkshopRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

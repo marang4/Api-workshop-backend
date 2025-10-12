@@ -1,6 +1,6 @@
-package com.senac.Api_workshops.dto;
+package com.senac.Api_workshops.application.dto.workshop;
 
-import com.senac.Api_workshops.model.Workshop;
+import com.senac.Api_workshops.domain.model.Workshop;
 
 import java.time.LocalDate;
 

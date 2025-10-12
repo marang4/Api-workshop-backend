@@ -1,13 +1,13 @@
-package com.senac.Api_workshops.services;
+package com.senac.Api_workshops.application.services;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.senac.Api_workshops.dto.LoginRequestDto;
-import com.senac.Api_workshops.model.Token;
-import com.senac.Api_workshops.model.Usuario;
-import com.senac.Api_workshops.repository.TokenRepository;
-import com.senac.Api_workshops.repository.UsuarioRepository;
+import com.senac.Api_workshops.application.dto.login.LoginRequestDto;
+import com.senac.Api_workshops.domain.model.Token;
+import com.senac.Api_workshops.domain.model.Usuario;
+import com.senac.Api_workshops.domain.repository.TokenRepository;
+import com.senac.Api_workshops.domain.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
