@@ -1,4 +1,4 @@
-package com.senac.Api_workshops.domain.model;
+package com.senac.Api_workshops.domain.entity;
 
 import com.senac.Api_workshops.application.dto.usuario.UsuarioRequestDto;
 import com.senac.Api_workshops.application.dto.usuario.UsuarioResponseDto;
@@ -20,6 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name="usuarios")
 public class Usuario implements UserDetails {
+
 
 
     public Usuario(UsuarioRequestDto UsuarioRequestDto) {
@@ -45,6 +46,7 @@ public class Usuario implements UserDetails {
 
     private LocalDateTime dataCadastro;
 
+    private String tokenSenha;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

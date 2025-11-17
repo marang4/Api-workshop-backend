@@ -4,8 +4,9 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.senac.Api_workshops.application.dto.login.LoginRequestDto;
-import com.senac.Api_workshops.domain.model.Token;
-import com.senac.Api_workshops.domain.model.Usuario;
+import com.senac.Api_workshops.application.dto.usuario.UsuarioprincipalDto;
+import com.senac.Api_workshops.domain.entity.Token;
+import com.senac.Api_workshops.domain.entity.Usuario;
 import com.senac.Api_workshops.domain.repository.TokenRepository;
 import com.senac.Api_workshops.domain.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,7 @@ public class TokenService {
     }
 
 
-    public Usuario validarToken(String token) {
+    public UsuarioprincipalDto validarToken(String token) {
         Algorithm algorithm = Algorithm.HMAC256(secret);
         JWTVerifier verifier = JWT.require(algorithm)
                 .withIssuer(emissor)
@@ -63,7 +64,7 @@ public class TokenService {
 
         }
 
-        return tokenResult.getUsuario();
+        return new UsuarioprincipalDto(tokenResult.getUsuario());
     }
 
 

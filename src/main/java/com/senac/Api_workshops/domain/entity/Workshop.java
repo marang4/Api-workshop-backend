@@ -1,5 +1,6 @@
-package com.senac.Api_workshops.domain.model;
+package com.senac.Api_workshops.domain.entity;
 
+import com.senac.Api_workshops.application.dto.workshop.WorkshopRequestDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,6 +17,16 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class Workshop {
 
+    public Workshop(WorkshopRequestDto WorkshopRequestDto) {
+        this.setTema(WorkshopRequestDto.tema());
+        this.setData(WorkshopRequestDto.data());
+        this.setLocal(WorkshopRequestDto.local());
+        this.setVagasTotais(WorkshopRequestDto.vagasTotais());
+        this.setVagasOcupadas(WorkshopRequestDto.vagasOcupadas());
+    }
+
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,6 +34,7 @@ public class Workshop {
     private LocalDate data;
     private Integer vagasTotais;
     private Integer vagasOcupadas;
+    private String local;
 
 
 }

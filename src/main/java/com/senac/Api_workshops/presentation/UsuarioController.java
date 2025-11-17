@@ -3,13 +3,13 @@ package com.senac.Api_workshops.presentation;
 import com.senac.Api_workshops.application.dto.usuario.UsuarioRequestDto;
 import com.senac.Api_workshops.application.dto.usuario.UsuarioResponseDto;
 import com.senac.Api_workshops.application.services.UsuarioService;
-import com.senac.Api_workshops.domain.model.Usuario;
 import com.senac.Api_workshops.domain.repository.UsuarioRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,14 +22,12 @@ public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioResponseDto> consultaPorId(@PathVariable Long id) {
+
         var usuario = usuarioService.consultarPorId(id);
 
-        //SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (usuario == null) {
             return ResponseEntity.notFound().build();
@@ -48,24 +46,27 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.consultarTodosSemFiltro());
     }
 
+    @GetMapping("/grid")
+    @Operation(summary = "Usuarios", description = "Metodo resposável por consultar dados dos usuarios paginados e filtrados")
+    public ResponseEntity<List<UsuarioResponseDto>> consultarPaginaFiltrado(
+            @Parameter(description = "Parametro de quantidade de registro por pagina") @RequestParam Long take,
+            @Parameter(description = "Parametro de quantidade de paginas")@RequestParam Long page,
+            @Parameter(description = "Parametro de filtro")@RequestParam String filtro){
+        return ResponseEntity.ok(usuarioService.consultarPaginaFiltrada(take, page, filtro));
+    }
+
     @PostMapping
     @Operation(summary = "Salvar usuário", description = "Método responsavel em criar usuarios")
     public ResponseEntity<UsuarioResponseDto> salvarUsuario(@RequestBody UsuarioRequestDto usuario) {
         try {
+
             var usuarioResponse = usuarioService.salvarUsuario(usuario);
+
             return ResponseEntity.ok(usuarioResponse);
         }catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
 
-    }
-
-    @GetMapping("/grid")
-    @Operation(summary = "usuario grid filtrado", description = "metodo responsavel por pesquisar ususarios filtrados")
-    public ResponseEntity<List<UsuarioResponseDto>> consultarPaginadoFiltrados(@Parameter(description = "parametro de quantidade de registro por pagina") @RequestParam Long take,
-                                                                               @Parameter(description = "parametro de quantidade de paginas")@RequestParam Long page,
-                                                                               @Parameter(description = "parametro de filtro")@RequestParam(required = false) String filtro ) {
-        return ResponseEntity.ok(usuarioService.consultarPaginaFiltrada(take, page, filtro));
     }
 
 }

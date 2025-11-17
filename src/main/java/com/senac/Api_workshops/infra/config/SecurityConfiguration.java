@@ -24,19 +24,21 @@ public class SecurityConfiguration {
         return http.cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
-                        auth
-                                .requestMatchers("/**").permitAll()
-                                .requestMatchers("/auth/login").permitAll()
-                                .requestMatchers(HttpMethod.OPTIONS,"/**").permitAll()
-                                .requestMatchers("/swagger-resources/**").permitAll()
-                                .requestMatchers("/swagger-ui/**").permitAll()
-                                .requestMatchers("/v3/api-docs/**").permitAll()
-                                .requestMatchers("/usuarios").hasRole("ADMIN")
-                                .requestMatchers("/workshop").hasRole("ADMIN")
-
-                                .anyRequest().authenticated()
+                                auth
+//                                .requestMatchers("/**").permitAll()
+                                        .requestMatchers("/auth/login").permitAll()
+                                        .requestMatchers("/auth/esqueciminhasenha").permitAll()
+                                        .requestMatchers("/auth/registrarnovasenha").permitAll()
+                                        .requestMatchers(HttpMethod.OPTIONS,"/**").permitAll() //liberar cors
+                                        .requestMatchers("/swagger-resources/**").permitAll()
+                                        .requestMatchers("/swagger-ui/**").permitAll()
+                                        .requestMatchers("/v3/api-docs/**").permitAll()
+                                        .requestMatchers("/usuarios").hasRole("ADMIN")
+                                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
+
     }
+
 }

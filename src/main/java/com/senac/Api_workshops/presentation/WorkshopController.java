@@ -1,7 +1,10 @@
 package com.senac.Api_workshops.presentation;
 
+import com.senac.Api_workshops.application.dto.usuario.UsuarioResponseDto;
 import com.senac.Api_workshops.application.dto.workshop.WorkshopRequestDto;
-import com.senac.Api_workshops.domain.model.Workshop;
+import com.senac.Api_workshops.application.dto.workshop.WorkshopResponseDto;
+import com.senac.Api_workshops.application.services.UsuarioService;
+import com.senac.Api_workshops.domain.entity.Workshop;
 import com.senac.Api_workshops.application.services.WorkshopService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,21 +22,25 @@ public class WorkshopController {
 
     @Autowired
     private WorkshopService workshopService;
+    @Autowired
+    private UsuarioService usuarioService;
 
     @GetMapping
     @Operation(summary = "Listar workshop", description = "Método responsável por listar todos os Workshops")
-    public ResponseEntity<List<Workshop>> consultarTodos() {
+    public ResponseEntity<List<WorkshopResponseDto>> consultarTodos() {
         return ResponseEntity.ok(workshopService.listarTodos());
     }
 
     @PostMapping
     @Operation(summary = "Cadastrar Workshop", description = "Método responsável por cadastrar workshops")
-    public ResponseEntity<?> cadastrarWorkshop(@RequestBody WorkshopRequestDto requestDto) {
+    public ResponseEntity<WorkshopResponseDto> cadastrarWorkshop(@RequestBody WorkshopRequestDto requestDto) {
         try {
-            Workshop workshopSalvo = workshopService.salvarWorkshop(requestDto);
-            return ResponseEntity.ok(workshopSalvo);
+            var workshopResponse = workshopService.salvarWorkshop(requestDto);
+            return ResponseEntity.ok(workshopResponse);
+
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body("Dados inválidos: " + e.getMessage());
+
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -49,13 +56,12 @@ public class WorkshopController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Editar workshop", description = "Metodo responsavel por editar workshops cadastrados")
-    public ResponseEntity<Workshop> editarWorkshop(@PathVariable Long id, @RequestBody WorkshopRequestDto requestDto) {
-        Optional<Workshop> workshopAtualizado = workshopService.editarWorkshop(id, requestDto);
+    @Operation(summary = "Editar workshop", description = "Método para editar workshops cadastrados")
+    public ResponseEntity<WorkshopResponseDto> editarWorkshop(
+            @PathVariable Long id,
+            @RequestBody WorkshopRequestDto requestDto) {
 
-
-        return workshopAtualizado
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        WorkshopResponseDto workshopAtualizado = workshopService.editarWorkshop(id, requestDto);
+        return ResponseEntity.ok(workshopAtualizado);
     }
 }

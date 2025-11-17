@@ -1,6 +1,6 @@
 package com.senac.Api_workshops.application.dto.usuario;
 
-import com.senac.Api_workshops.domain.model.Usuario;
+import com.senac.Api_workshops.domain.entity.Usuario;
 
 public record UsuarioResponseDto(Long id,
                                  String nome,

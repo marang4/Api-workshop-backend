@@ -15,49 +15,55 @@ import java.io.IOException;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
-
-
     @Autowired
     private TokenService tokenService;
 
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String path = request.getRequestURI();
+        String path = request.getRequestURI(); // path o caminho que cehgou a requisicao
 
-        try{
-            if (path.equals("/auth/login") || path.startsWith("swagger-resources")
+
+        try {
+
+
+            //se for alguma dessas urls ele libera para passar,
+            if (path.equals("/auth/login")
+                    || path.equals("/auth/esqueciminhasenha")
+                    || path.equals("/auth/registrarnovasenha")
+                    || path.startsWith("/swagger-resources")
                     || path.startsWith("/v3/api-docs")
-                    || path.startsWith("/")
-                    || path.startsWith("/webjars")
-                    || path.startsWith("/swagger-ui")) {
-                filterChain.doFilter(request, response);
+                    || path.startsWith("/webjars") //|| path.startsWith("/")
+                    || path.startsWith("/swagger-ui")){
+
+                filterChain.doFilter(request, response); //se for a url ele manda seguir
                 return;
             }
 
-            String header = request.getHeader("Authorization");
-            if (header != null && header.startsWith("Bearer ") ) {
-                String token = header.replace("Bearer ", "");
 
+            String header = request.getHeader("Authorization");
+            if (header != null && header.startsWith("Bearer ")) {
+                String token = header.replace("Bearer ", "");
                 var usuario = tokenService.validarToken(token);
 
-                var autorizacao = new UsernamePasswordAuthenticationToken(usuario.getEmail(),
+
+
+                var autorizacao = new UsernamePasswordAuthenticationToken(usuario,
                         null,
-                        usuario.getAuthorities());
+                        usuario.autorizacao());
 
                 SecurityContextHolder.getContext().setAuthentication(autorizacao);
+
                 filterChain.doFilter(request, response);
-            }else {
+            } else {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("Token não informado");
                 return;
-                //filterChain.doFilter(request, response); colcoar aqui e comentar cosigo acima
             }
-        }catch (Exception e){
+
+        } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("token nao informado");
+            response.getWriter().write("Token não informado");
             return;
         }
-
     }
 }
