@@ -1,5 +1,6 @@
 package com.senac.Api_workshops.presentation;
 
+import com.senac.Api_workshops.application.dto.usuario.UsuarioPrincipalDTO;
 import com.senac.Api_workshops.application.dto.usuario.UsuarioRequestDto;
 import com.senac.Api_workshops.application.dto.usuario.UsuarioResponseDto;
 import com.senac.Api_workshops.application.services.UsuarioService;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,13 +40,6 @@ public class UsuarioController {
 
     }
 
-    @GetMapping
-    @Operation(summary = "usuario", description = "Método responsavel de calcular os custos da folha de pagamento e após faz os lançamentos contabeis na tabela....") //documentar a operaçcao
-    public ResponseEntity<List<UsuarioResponseDto>> consultarTodos() {
-
-
-        return ResponseEntity.ok(usuarioService.consultarTodosSemFiltro());
-    }
 
     @GetMapping("/grid")
     @Operation(summary = "Usuarios", description = "Metodo resposável por consultar dados dos usuarios paginados e filtrados")
@@ -67,6 +62,54 @@ public class UsuarioController {
             return ResponseEntity.badRequest().build();
         }
 
+    }
+
+    @PostMapping("/admin/criar")
+    @Operation(summary = "Criar Usuário (Admin)", description = "Cria Organizadores ou Admins")
+    public ResponseEntity<?> criarUsuarioPeloAdmin(
+            @RequestBody UsuarioRequestDto dto,
+            @AuthenticationPrincipal UsuarioPrincipalDTO usuarioLogado
+    ) {
+
+        if (!usuarioLogado.isAdmin()) {
+            return ResponseEntity.status(403).body("Apenas Administradores podem realizar essa ação.");
+        }
+
+        try {
+            var response = usuarioService.salvarUsuarioPeloAdmin(dto);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+
+    @GetMapping
+    public ResponseEntity<List<UsuarioResponseDto>> listarTodos(@AuthenticationPrincipal UsuarioPrincipalDTO usuarioLogado) {
+        if (!usuarioLogado.isAdmin()) return ResponseEntity.status(403).build();
+        return ResponseEntity.ok(usuarioService.consultarTodosSemFiltro());
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Excluir usuário", description = "Remove um usuário do sistema (Apenas Admin)")
+    public ResponseEntity<?> excluirUsuario(@PathVariable Long id, @AuthenticationPrincipal UsuarioPrincipalDTO usuarioLogado) {
+
+
+        if (!usuarioLogado.isAdmin()) {
+            return ResponseEntity.status(403).body("Acesso negado.");
+        }
+
+
+        if (usuarioLogado.id().equals(id)) {
+            return ResponseEntity.badRequest().body("Você não pode excluir sua própria conta enquanto está logado.");
+        }
+
+        try {
+            usuarioService.excluirUsuario(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
 }

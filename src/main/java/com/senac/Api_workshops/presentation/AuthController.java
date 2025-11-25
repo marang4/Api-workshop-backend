@@ -4,7 +4,8 @@ import com.senac.Api_workshops.application.dto.login.EsqueciMinhaSenhaDto;
 import com.senac.Api_workshops.application.dto.login.LoginRequestDto;
 import com.senac.Api_workshops.application.dto.login.LoginResponseDto;
 import com.senac.Api_workshops.application.dto.usuario.RegistroNovaSenhaDto;
-import com.senac.Api_workshops.application.dto.usuario.UsuarioprincipalDto;
+import com.senac.Api_workshops.application.dto.usuario.UsuarioResponseDto;
+import com.senac.Api_workshops.application.dto.usuario.UsuarioPrincipalDTO;
 import com.senac.Api_workshops.application.services.TokenService;
 import com.senac.Api_workshops.application.services.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,8 +26,8 @@ public class AuthController {
 
     @Autowired
     private UsuarioService usuarioService;
+
     @PostMapping("/login")
-    @Operation(summary = "Login", description = "metodo responsavel por efetuar o login do usuario")
     public ResponseEntity<?> login(@RequestBody LoginRequestDto request) {
 
 
@@ -37,17 +38,19 @@ public class AuthController {
 
         var token = tokenService.gerarToken(request);
 
-        return ResponseEntity.ok(new LoginResponseDto(token));
+
+        var usuarioDto = usuarioService.buscarPorEmail(request.email());
+
+
+        return ResponseEntity.ok(new LoginResponseDto(token, usuarioDto));
     }
 
     @GetMapping("/recuperarsenha/envio")
     @Operation(summary = "recuperar senha", description = "metodo utilizado para recuperaçao de senha")
-    public ResponseEntity<?> recuperarSenha(@AuthenticationPrincipal UsuarioprincipalDto usuarioLogado) {
+    public ResponseEntity<?> recuperarSenha(@AuthenticationPrincipal UsuarioPrincipalDTO usuarioLogado) {
         usuarioService.recuperarSenhaEnvio(usuarioLogado);
         return ResponseEntity.ok("Codigo enviado com sucesso");
     }
-
-
 
     @PostMapping("/esqueciminhasenha")
     @Operation(summary = "esqueci minha senha", description = "metodo para recuperar senha")
@@ -71,5 +74,6 @@ public class AuthController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
-
 }
+
+

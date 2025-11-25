@@ -1,5 +1,6 @@
 package com.senac.Api_workshops.infra.config;
 
+import com.senac.Api_workshops.application.dto.usuario.UsuarioPrincipalDTO;
 import com.senac.Api_workshops.application.services.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -15,55 +16,59 @@ import java.io.IOException;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
+
     @Autowired
     private TokenService tokenService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String path = request.getRequestURI(); // path o caminho que cehgou a requisicao
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+
+        String path = request.getRequestURI();
+        String method = request.getMethod();
+
+
+        if (path.equals("/auth/login")
+                || path.equals("/auth/esqueciminhasenha")
+                || path.equals("/auth/registrarnovasenha")
+                || (path.equals("/usuarios") && method.equals("POST"))
+                || path.startsWith("/auth/recuperarsenha")
+                || path.startsWith("/auth/alterarsenha")
+                || path.startsWith("/auth/resetarsenha")
+                || path.startsWith("/swagger-resources")
+                || path.startsWith("/v3/api-docs")
+                || path.startsWith("/webjars")
+                || path.startsWith("/swagger-ui")) {
+
+            filterChain.doFilter(request, response);
+            return;
+        }
 
 
         try {
-
-
-            //se for alguma dessas urls ele libera para passar,
-            if (path.equals("/auth/login")
-                    || path.equals("/auth/esqueciminhasenha")
-                    || path.equals("/auth/registrarnovasenha")
-                    || path.startsWith("/swagger-resources")
-                    || path.startsWith("/v3/api-docs")
-                    || path.startsWith("/webjars") //|| path.startsWith("/")
-                    || path.startsWith("/swagger-ui")){
-
-                filterChain.doFilter(request, response); //se for a url ele manda seguir
-                return;
-            }
-
-
             String header = request.getHeader("Authorization");
             if (header != null && header.startsWith("Bearer ")) {
                 String token = header.replace("Bearer ", "");
-                var usuario = tokenService.validarToken(token);
 
+                UsuarioPrincipalDTO usuarioPrincipal = tokenService.validarToken(token);
 
-
-                var autorizacao = new UsernamePasswordAuthenticationToken(usuario,
+                var autenticacao = new UsernamePasswordAuthenticationToken(
+                        usuarioPrincipal,
                         null,
-                        usuario.autorizacao());
+                        usuarioPrincipal.autorizacao()
+                );
 
-                SecurityContextHolder.getContext().setAuthentication(autorizacao);
-
+                SecurityContextHolder.getContext().setAuthentication(autenticacao);
                 filterChain.doFilter(request, response);
             } else {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("Token não informado");
-                return;
             }
 
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Token não informado");
-            return;
+            response.getWriter().write("Token inválido");
         }
     }
 }
+

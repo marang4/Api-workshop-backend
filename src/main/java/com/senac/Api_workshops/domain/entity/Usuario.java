@@ -48,14 +48,29 @@ public class Usuario implements UserDetails {
 
     private String tokenSenha;
 
+
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if("ROLE_ADMIN".equals(this.role)) {
-            return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"),
-                    new SimpleGrantedAuthority("ROLE_USER"));
+        if ("ROLE_ADMIN".equals(this.role)) {
+            return List.of(
+                    new SimpleGrantedAuthority("ROLE_ADMIN"),
+                    new SimpleGrantedAuthority("ROLE_ORGANIZADOR"),
+                    new SimpleGrantedAuthority("ROLE_USER")
+            );
+
+        }else if ("ROLE_ORGANIZADOR".equals(this.role)) {
+            return List.of(
+                    new SimpleGrantedAuthority("ROLE_ORGANIZADOR"),
+                    new SimpleGrantedAuthority("ROLE_USER")
+            );
+
         }else {
-            return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+            return List.of(new SimpleGrantedAuthority("ROLE_USER")
+            );
         }
+
+
     }
 
     @Override

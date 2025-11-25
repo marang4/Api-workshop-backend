@@ -1,10 +1,7 @@
 package com.senac.Api_workshops.domain.entity;
 
 import com.senac.Api_workshops.application.dto.workshop.WorkshopRequestDto;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -35,6 +32,10 @@ public class Workshop {
     private Integer vagasTotais;
     private Integer vagasOcupadas;
     private String local;
+
+    @ManyToOne
+    @JoinColumn(name = "criador_id")
+    private Usuario criador;
 
 
 }

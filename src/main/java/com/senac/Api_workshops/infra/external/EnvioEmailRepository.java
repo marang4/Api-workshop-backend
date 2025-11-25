@@ -41,7 +41,7 @@ public class EnvioEmailRepository implements IEnvioEmail {
 
             String htmlFinal = htmlTemplate
                     .replace("${mensagem}", texto)
-                    .replace("${dataEnvio}", String.valueOf(LocalDateTime.now()));
+                    .replace("${dataEnvio}", java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm").format(LocalDateTime.now()));
 
             helper.setFrom("nao-responda@suaempresa.com");
             helper.setTo(para);

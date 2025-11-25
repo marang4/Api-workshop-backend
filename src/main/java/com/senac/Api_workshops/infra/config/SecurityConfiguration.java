@@ -8,6 +8,8 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -23,22 +25,32 @@ public class SecurityConfiguration {
 
         return http.cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth ->
-                                auth
-//                                .requestMatchers("/**").permitAll()
-                                        .requestMatchers("/auth/login").permitAll()
-                                        .requestMatchers("/auth/esqueciminhasenha").permitAll()
-                                        .requestMatchers("/auth/registrarnovasenha").permitAll()
-                                        .requestMatchers(HttpMethod.OPTIONS,"/**").permitAll() //liberar cors
-                                        .requestMatchers("/swagger-resources/**").permitAll()
-                                        .requestMatchers("/swagger-ui/**").permitAll()
-                                        .requestMatchers("/v3/api-docs/**").permitAll()
-                                        .requestMatchers("/usuarios").hasRole("ADMIN")
-                                        .anyRequest().authenticated()
+                .authorizeHttpRequests(auth -> auth
+
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+
+
+                        .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "/workshop").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/workshop/gerenciar").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/workshop").hasAnyRole("ADMIN", "ORGANIZADOR")
+                        .requestMatchers(HttpMethod.PUT, "/workshop/**").hasAnyRole("ADMIN", "ORGANIZADOR")
+                        .requestMatchers(HttpMethod.DELETE, "/workshop/**").hasAnyRole("ADMIN", "ORGANIZADOR")
+
+
+                        .requestMatchers("/usuarios/**").hasRole("ADMIN")
+
+
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
-
     }
 
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 }

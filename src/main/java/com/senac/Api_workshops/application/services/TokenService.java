@@ -4,7 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.senac.Api_workshops.application.dto.login.LoginRequestDto;
-import com.senac.Api_workshops.application.dto.usuario.UsuarioprincipalDto;
+import com.senac.Api_workshops.application.dto.usuario.UsuarioPrincipalDTO;
 import com.senac.Api_workshops.domain.entity.Token;
 import com.senac.Api_workshops.domain.entity.Usuario;
 import com.senac.Api_workshops.domain.repository.TokenRepository;
@@ -50,7 +50,7 @@ public class TokenService {
     }
 
 
-    public UsuarioprincipalDto validarToken(String token) {
+    public UsuarioPrincipalDTO validarToken(String token) {
         Algorithm algorithm = Algorithm.HMAC256(secret);
         JWTVerifier verifier = JWT.require(algorithm)
                 .withIssuer(emissor)
@@ -64,7 +64,7 @@ public class TokenService {
 
         }
 
-        return new UsuarioprincipalDto(tokenResult.getUsuario());
+        return new UsuarioPrincipalDTO(tokenResult.getUsuario());
     }
 
 

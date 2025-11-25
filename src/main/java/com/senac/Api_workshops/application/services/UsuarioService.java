@@ -5,12 +5,13 @@ import com.senac.Api_workshops.application.dto.login.LoginRequestDto;
 import com.senac.Api_workshops.application.dto.usuario.RegistroNovaSenhaDto;
 import com.senac.Api_workshops.application.dto.usuario.UsuarioRequestDto;
 import com.senac.Api_workshops.application.dto.usuario.UsuarioResponseDto;
-import com.senac.Api_workshops.application.dto.usuario.UsuarioprincipalDto;
+import com.senac.Api_workshops.application.dto.usuario.UsuarioPrincipalDTO;
 import com.senac.Api_workshops.domain.interfaces.IEnvioEmail;
 import com.senac.Api_workshops.domain.entity.Usuario;
 import com.senac.Api_workshops.domain.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -28,8 +29,43 @@ public class UsuarioService {
     @Autowired
     private IEnvioEmail iEnvioEmail;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder; // <--- INJETE ISSO
+
+    // 1. AJUSTE NO LOGIN (Validar Senha)
     public boolean validarSenha(LoginRequestDto loginRequestDto) {
-        return usuarioRepository.existsUsuarioByEmailContainingAndSenha(loginRequestDto.email(), loginRequestDto.senha());
+        // Busca o usuário pelo email
+        var usuario = usuarioRepository.findByEmail(loginRequestDto.email()).orElse(null);
+
+        if (usuario != null) {
+            // Compara a senha que chegou (texto puro) com o hash do banco
+            return passwordEncoder.matches(loginRequestDto.senha(), usuario.getSenha());
+        }
+
+        return false;
+    }
+
+    @Transactional
+    public UsuarioResponseDto salvarUsuarioPeloAdmin(UsuarioRequestDto dto) {
+        if (usuarioRepository.findByEmail(dto.email()).isPresent()) {
+            throw new RuntimeException("Email já cadastrado");
+        }
+
+        Usuario usuario = new Usuario(dto);
+
+        // CRIPTOGRAFA A SENHA ANTES DE SALVAR
+        usuario.setSenha(passwordEncoder.encode(dto.senha()));
+
+        // ... (lógica das roles que já fizemos) ...
+        String roleRecebida = dto.role().toUpperCase();
+        if (!roleRecebida.startsWith("ROLE_")) {
+            usuario.setRole("ROLE_" + roleRecebida);
+        } else {
+            usuario.setRole(roleRecebida);
+        }
+
+        usuarioRepository.save(usuario);
+        return new UsuarioResponseDto(usuario);
     }
 
 
@@ -38,6 +74,14 @@ public class UsuarioService {
         return usuarioRepository.findById(id).map(UsuarioResponseDto::new).orElse(null);
     }
 
+    public UsuarioResponseDto buscarPorEmail(String email) {
+        // 1. Busca a entidade no banco (aqui o Service pode chamar o Repository)
+        var usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        // 2. Converte para DTO e retorna
+        return new UsuarioResponseDto(usuario);
+    }
     public List<UsuarioResponseDto> consultarTodosSemFiltro() {
         return usuarioRepository.findAll()
                 .stream()
@@ -48,20 +92,17 @@ public class UsuarioService {
 
     @Transactional
     public UsuarioResponseDto salvarUsuario(UsuarioRequestDto usuarioRequest) {
-        var usuario = usuarioRepository.findByCpf(usuarioRequest.cpf()).map(u -> {
+        // ... (lógica de busca por CPF existente) ...
+        var usuario = new Usuario(usuarioRequest); // Simplificando para o exemplo
 
-                    u.setNome(usuarioRequest.nome());
-                    u.setEmail(usuarioRequest.email());
-                    u.setSenha(usuarioRequest.senha());
-                    u.setRole(usuarioRequest.role());
-                    return u;
-                })
-                .orElse(new Usuario(usuarioRequest));
+        // CRIPTOGRAFA A SENHA
+        usuario.setSenha(passwordEncoder.encode(usuarioRequest.senha()));
 
+        // Define Role
+        usuario.setRole("ROLE_USER");
 
         usuarioRepository.save(usuario);
         return usuario.toDtoResponse();
-
     }
 
     public List<UsuarioResponseDto> consultarPaginaFiltrada(Long take, Long page, String filtro) {
@@ -77,7 +118,7 @@ public class UsuarioService {
                 .collect(Collectors.toList());
     }
 
-    public void recuperarSenhaEnvio(UsuarioprincipalDto usuarioLogado) {
+    public void recuperarSenhaEnvio(UsuarioPrincipalDTO usuarioLogado) {
         iEnvioEmail.enviarEmailSimples(usuarioLogado.email(),
                 "codigo de recuperação",
                 "123456"
@@ -103,9 +144,22 @@ public class UsuarioService {
             usuario.setTokenSenha(codigo);
             usuarioRepository.save(usuario);
 
-            iEnvioEmail.enviarEmailComTemplate(esqueciMinhaSenhaDto.email(),
-                    "codigo recuperacao",
-                    codigo);
+
+            String linkReset = "http://localhost:5173/resetar-senha?token=" + codigo + "&email=" + usuario.getEmail();
+
+
+            String mensagemHtml = "<p>Recebemos uma solicitação para redefinir sua senha.</p>" +
+                    "<p>Seu código de verificação é: <strong style='font-size: 18px; color: #0056b3;'>" + codigo + "</strong></p>" +
+                    "<p>Ou clique no botão abaixo para redefinir diretamente:</p>" +
+                    "<br>" +
+                    "<a href='" + linkReset + "' style='display: inline-block; padding: 10px 20px; font-size: 16px; font-weight: bold; color: #ffffff; background-color: #0056b3; text-decoration: none; border-radius: 5px;'>Redefinir Senha</a>";
+
+
+            iEnvioEmail.enviarEmailComTemplate(
+                    esqueciMinhaSenhaDto.email(),
+                    "Redefinição de Senha - WorkshopsDev",
+                    mensagemHtml
+            );
         }
     }
 
@@ -117,9 +171,22 @@ public class UsuarioService {
                 .orElse(null);
 
         if(usuario != null) {
-            usuario.setSenha(registroNovaSenhaDto.senha());
+
+            usuario.setSenha(passwordEncoder.encode(registroNovaSenhaDto.senha()));
+
+            usuario.setTokenSenha(null);
+
             usuarioRepository.save(usuario);
+        } else {
+            throw new RuntimeException("Token inválido ou expirado.");
         }
+    }
+
+    public void excluirUsuario(Long id) {
+        if (!usuarioRepository.existsById(id)) {
+            throw new RuntimeException("Usuário não encontrado");
+        }
+        usuarioRepository.deleteById(id);
     }
 
 
