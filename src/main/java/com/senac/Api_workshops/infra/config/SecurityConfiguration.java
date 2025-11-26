@@ -27,14 +27,20 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
 
+                        //.requestMatchers("/**").permitAll()
                         .requestMatchers("/auth/**").permitAll()
+
+
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
 
                         .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
 
+
                         .requestMatchers(HttpMethod.GET, "/workshop").permitAll()
+
                         .requestMatchers(HttpMethod.GET, "/workshop/gerenciar").authenticated()
+
                         .requestMatchers(HttpMethod.POST, "/workshop").hasAnyRole("ADMIN", "ORGANIZADOR")
                         .requestMatchers(HttpMethod.PUT, "/workshop/**").hasAnyRole("ADMIN", "ORGANIZADOR")
                         .requestMatchers(HttpMethod.DELETE, "/workshop/**").hasAnyRole("ADMIN", "ORGANIZADOR")

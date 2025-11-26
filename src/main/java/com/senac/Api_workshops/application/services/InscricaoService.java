@@ -37,21 +37,21 @@ public class InscricaoService {
             throw new RuntimeException("Organizadores e Admins não podem se inscrever em workshops.");
         }
 
-        // 3. Verificar Duplicidade
+
         if (inscricaoRepository.existsByUsuarioIdAndWorkshopId(usuario.getId(), workshop.getId())) {
             throw new RuntimeException("Usuário já está inscrito neste workshop.");
         }
 
-        // 4. Verificar Vagas
+
         if (workshop.getVagasOcupadas() >= workshop.getVagasTotais()) {
             throw new RuntimeException("Não há vagas disponíveis para este workshop.");
         }
 
-        // 5. Atualizar Vagas Ocupadas
-        workshop.setVagasOcupadas(workshop.getVagasOcupadas() + 1);
-        workshopRepository.save(workshop); // Salva a nova contagem de vagas
 
-        // 6. Criar e Salvar Inscrição
+        workshop.setVagasOcupadas(workshop.getVagasOcupadas() + 1);
+        workshopRepository.save(workshop);
+
+
         Inscricao novaInscricao = new Inscricao(usuario, workshop);
         inscricaoRepository.save(novaInscricao);
 

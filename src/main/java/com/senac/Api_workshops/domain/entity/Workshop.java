@@ -33,6 +33,9 @@ public class Workshop {
     private Integer vagasOcupadas;
     private String local;
 
+    @Column(columnDefinition = "TEXT") // Permite textos longos
+    private String descricao;
+
     @ManyToOne
     @JoinColumn(name = "criador_id")
     private Usuario criador;

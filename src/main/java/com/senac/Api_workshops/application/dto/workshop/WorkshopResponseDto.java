@@ -6,6 +6,7 @@ import java.time.LocalDate;
 
 public record WorkshopResponseDto( Long id,
                                    String tema,
+                                  String descricao,
                                   LocalDate data,
                                   Integer vagasTotais,
                                   Integer vagasOcupadas,
@@ -16,6 +17,7 @@ public record WorkshopResponseDto( Long id,
         this(
                 workshop.getId(),
                 workshop.getTema(),
+                workshop.getDescricao(),
                 workshop.getData(),
                 workshop.getVagasTotais(),
                 workshop.getVagasOcupadas(),

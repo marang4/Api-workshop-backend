@@ -3,8 +3,8 @@ package com.senac.Api_workshops.presentation;
 import com.senac.Api_workshops.application.dto.login.EsqueciMinhaSenhaDto;
 import com.senac.Api_workshops.application.dto.login.LoginRequestDto;
 import com.senac.Api_workshops.application.dto.login.LoginResponseDto;
+import com.senac.Api_workshops.application.dto.usuario.AlterarSenhaDto;
 import com.senac.Api_workshops.application.dto.usuario.RegistroNovaSenhaDto;
-import com.senac.Api_workshops.application.dto.usuario.UsuarioResponseDto;
 import com.senac.Api_workshops.application.dto.usuario.UsuarioPrincipalDTO;
 import com.senac.Api_workshops.application.services.TokenService;
 import com.senac.Api_workshops.application.services.UsuarioService;
@@ -17,9 +17,8 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
-@Tag(name= "Controller autenticação", description = "Controller responsavel pela autenticação da aplicaçao")
+@Tag(name= "Autenticação", description = "Endpoints para login e recuperação de senha")
 public class AuthController {
-
 
     @Autowired
     private TokenService tokenService;
@@ -28,52 +27,51 @@ public class AuthController {
     private UsuarioService usuarioService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequestDto request) {
-
-
+    @Operation(summary = "Realizar Login", description = "Fazer Login no sistema.")
+    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto request) {
         if (!usuarioService.validarSenha(request)) {
-            return ResponseEntity.badRequest().body("Usuario ou senha invalido");
+            return ResponseEntity.badRequest().build();
         }
 
-
         var token = tokenService.gerarToken(request);
-
-
         var usuarioDto = usuarioService.buscarPorEmail(request.email());
-
 
         return ResponseEntity.ok(new LoginResponseDto(token, usuarioDto));
     }
 
-    @GetMapping("/recuperarsenha/envio")
-    @Operation(summary = "recuperar senha", description = "metodo utilizado para recuperaçao de senha")
-    public ResponseEntity<?> recuperarSenha(@AuthenticationPrincipal UsuarioPrincipalDTO usuarioLogado) {
-        usuarioService.recuperarSenhaEnvio(usuarioLogado);
-        return ResponseEntity.ok("Codigo enviado com sucesso");
-    }
-
     @PostMapping("/esqueciminhasenha")
-    @Operation(summary = "esqueci minha senha", description = "metodo para recuperar senha")
-    public ResponseEntity<?> esqueciMinhaSenha(@RequestBody EsqueciMinhaSenhaDto esqueciMinhaSenha){
+    @Operation(summary = "Solicitar Recuperação", description = "Envia e-mail com link para redefinição de senha.")
+    public ResponseEntity<String> esqueciMinhaSenha(@RequestBody EsqueciMinhaSenhaDto dto){
         try {
-            usuarioService.esqueciMinhaSenha(esqueciMinhaSenha);
-            return ResponseEntity.ok("Codigo enviado com sucesso");
+            usuarioService.esqueciMinhaSenha(dto);
+            return ResponseEntity.ok("Se o e-mail existir, o link foi enviado.");
         }catch (Exception ex){
-            return  ResponseEntity.badRequest().body(ex.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
 
     @PostMapping("/registrarnovasenha")
-    @Operation(summary = "Registrar nova senha", description = "metodo para alterar senha")
-    public ResponseEntity<?> registroNovaSenha(@RequestBody RegistroNovaSenhaDto registroNovaSenhaDto){
+    @Operation(summary = "Redefinir Senha", description = "Salva a nova senha utilizando o token recebido por e-mail.")
+    public ResponseEntity<Void> registroNovaSenha(@RequestBody RegistroNovaSenhaDto dto){
         try {
-            usuarioService.registrarNovaSenha(registroNovaSenhaDto);
+            usuarioService.registrarNovaSenha(dto);
             return ResponseEntity.ok().build();
-
         }catch (Exception ex){
-            return ResponseEntity.badRequest().body(ex.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PostMapping("/alterarsenha")
+    @Operation(summary = "Alterar Senha (Logado)", description = "alterar senha do usuario")
+    public ResponseEntity<Void> alterarSenha(
+            @RequestBody AlterarSenhaDto dto,
+            @AuthenticationPrincipal UsuarioPrincipalDTO usuarioLogado
+    ) {
+        try {
+            usuarioService.alterarSenha(usuarioLogado.id(), dto.senhaAtual(), dto.novaSenha());
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
         }
     }
 }
-
-

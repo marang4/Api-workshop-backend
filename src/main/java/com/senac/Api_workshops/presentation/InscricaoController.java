@@ -19,32 +19,29 @@ public class InscricaoController {
     private InscricaoService inscricaoService;
 
     @PostMapping
-    @Operation(summary = "Inscrever usuário", description = "Realiza a inscrição de um usuário em um workshop")
-    // Alterado para Object para permitir retornar o DTO (sucesso) ou uma String/Erro (falha)
-    // Se quisesse ser purista, criaria uma classe ErrorResponseDto.
-    public ResponseEntity<Object> realizarInscricao(@RequestBody InscricaoRequestDto request) {
+    @Operation(summary = "Inscrever usuário", description = "usuario se inscreve em um workshop.")
+    public ResponseEntity<InscricaoResponseDto> realizarInscricao(@RequestBody InscricaoRequestDto request) {
         try {
             InscricaoResponseDto response = inscricaoService.realizarInscricao(request);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
-            // Retorna erro 400 com a mensagem da exceção (ex: "Sem vagas")
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
     @DeleteMapping("/cancelar")
-    @Operation(summary = "Cancelar Inscrição", description = "Remove a inscrição e libera a vaga")
-    public ResponseEntity<?> cancelarInscricao(@RequestBody InscricaoRequestDto request) {
+    @Operation(summary = "Cancelar Inscrição", description = "usuarios cancela a inscriçao no workshop.")
+    public ResponseEntity<Void> cancelarInscricao(@RequestBody InscricaoRequestDto request) {
         try {
             inscricaoService.cancelarInscricao(request.usuarioId(), request.workshopId());
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
 
-
     @GetMapping("/status")
+    @Operation(summary = "Verificar Status", description = "verifica se o usuario ja esta cadastrado no workshop.")
     public ResponseEntity<Boolean> verificarInscricao(
             @RequestParam Long idUsuario,
             @RequestParam Long idWorkshop) {

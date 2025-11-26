@@ -20,6 +20,8 @@ public class JwtFilter extends OncePerRequestFilter {
     @Autowired
     private TokenService tokenService;
 
+
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
@@ -28,13 +30,15 @@ public class JwtFilter extends OncePerRequestFilter {
         String method = request.getMethod();
 
 
-        if (path.equals("/auth/login")
+
+
+        if (
+
+                path.equals("/auth/login")
+                //||path.startsWith("/")
                 || path.equals("/auth/esqueciminhasenha")
                 || path.equals("/auth/registrarnovasenha")
                 || (path.equals("/usuarios") && method.equals("POST"))
-                || path.startsWith("/auth/recuperarsenha")
-                || path.startsWith("/auth/alterarsenha")
-                || path.startsWith("/auth/resetarsenha")
                 || path.startsWith("/swagger-resources")
                 || path.startsWith("/v3/api-docs")
                 || path.startsWith("/webjars")
