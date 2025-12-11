@@ -15,10 +15,10 @@ FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 
 # ---- CORREÇÃO 1: Copiamos o arquivo com seu nome exato para a pasta atual (.) ----
-COPY --from=builder /app/target/web-0.0.1-SNAPSHOT.jar .
+COPY --from=builder /app/target/Api-workshops-0.0.1-SNAPSHOT.jar .
 
 # Expõe a porta que sua API usa
 EXPOSE 8080
 
 # ---- CORREÇÃO 2: Executamos o arquivo com seu nome exato ----
-ENTRYPOINT ["java","-jar","web-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java","-jar","Api-workshops-0.0.1-SNAPSHOT.jar"]
